@@ -197,10 +197,51 @@ public class Level {
 	//Your code goes here! 
 	//Please make sure you read the rubric/directions carefully and implement the solution recursively!
 	private void water(int col, int row, Map map, int fullness) {
+
+		//1st set up types of fullness
+
+		if(fullness == 3){
+			Water w = new Water(col, row, tileSize, tileset.getImage("Full_water"), this, 3);
+		}
+		else if(fullness == 2){
+			Water w = new Water(col, row, tileSize, tileset.getImage("Half_water"), this, 2);
+		}
+		else if(fullness == 1){
+			Water w = new Water(col, row, tileSize, tileset.getImage("Quarter_water"), this, 1);
+		}
+		else if(fullness == 0){
+			Water w = new Water(col, row, tileSize, tileset.getImage("Falling_water"), this, 0);
+		}
 		
+		map.addTile(col, row, w);
+
+		//2nd make the logic for water
+
+		//falling water
+		if (row+1 < map.getTiles()[col].length && map.getTiles()[col][row+1].isSolid() == false) {
+			water(col, row+1, map, 0);
+		}
+
+		//if col + 1 is in bounds, is not an instanceof Water, is not solid, and fullness = 3, then add fullness 2 tile
+		if(col+1 < map.getTiles().length && !(map.getTiles()[col+1][row] instanceof Water) && !(map.getTiles()[col+1][row].isSolid())) {
+			water(col+1, row, map, 2);
+			//make it continue like recursive idk
+		}
+
+		//left
+		if(col-1 >= 0 && !(map.getTiles()[col-1][row] instanceof Water) && !(map.getTiles()[col-1][row].isSolid())) {
+			water(col-1, row, map, 2);
+
+		}
+
 	}
 
-
+/*Water w = new Water(col, row, tileSize, tileset.getImage("Full_water"), this, 3);
+		map.addTile(col, row, w);
+		if(col+1 < map.getTiles()[0].length && map.getTiles()[col+1][row] instanceof Water == false && map.getTiles()[col+1][row].isSolid()){
+			water(col+1, row, map, fullness);
+		}
+		*/
 
 	public void draw(Graphics g) {
 		g.translate((int) -camera.getX(), (int) -camera.getY());
