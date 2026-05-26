@@ -200,17 +200,18 @@ public class Level {
 
 		//1st set up types of fullness
 
+		Water w;
 		if(fullness == 3){
-			Water w = new Water(col, row, tileSize, tileset.getImage("Full_water"), this, 3);
+			w = new Water(col, row, tileSize, tileset.getImage("Full_water"), this, 3);
 		}
 		else if(fullness == 2){
-			Water w = new Water(col, row, tileSize, tileset.getImage("Half_water"), this, 2);
+			w = new Water(col, row, tileSize, tileset.getImage("Half_water"), this, 2);
 		}
 		else if(fullness == 1){
-			Water w = new Water(col, row, tileSize, tileset.getImage("Quarter_water"), this, 1);
+			w = new Water(col, row, tileSize, tileset.getImage("Quarter_water"), this, 1);
 		}
-		else if(fullness == 0){
-			Water w = new Water(col, row, tileSize, tileset.getImage("Falling_water"), this, 0);
+		else{
+			w = new Water(col, row, tileSize, tileset.getImage("Falling_water"), this, 0);
 		}
 		
 		map.addTile(col, row, w);
@@ -222,18 +223,36 @@ public class Level {
 			water(col, row+1, map, 0);
 		}
 
+		else{
 		//if col + 1 is in bounds, is not an instanceof Water, is not solid, and fullness = 3, then add fullness 2 tile
 		if(col+1 < map.getTiles().length && !(map.getTiles()[col+1][row] instanceof Water) && !(map.getTiles()[col+1][row].isSolid())) {
-			water(col+1, row, map, 2);
-			//make it continue like recursive idk
+			if(fullness == 3 ){
+				water(col+1, row, map, 2);
+			}
+			else if(fullness == 2){
+				water(col+1, row, map, 1);
+			}
+			else if(fullness == 1){
+				water(col+1, row, map, 1);
+			}
 		}
 
 		//left
 		if(col-1 >= 0 && !(map.getTiles()[col-1][row] instanceof Water) && !(map.getTiles()[col-1][row].isSolid())) {
-			water(col-1, row, map, 2);
-
+			if(fullness == 3){
+				water(col-1, row, map, 2);
+			}
+			else if(fullness == 2){
+				water(col-1, row, map, 1);
+			}
+			else if(fullness == 1){
+				water(col-1, row, map, 1);
+			}
 		}
-
+		if(fullness == 0 && row+1<map.getTiles()[col].length && map.getTiles()[col][row+1].isSolid()){
+			water(col, row, map, 3);
+		}
+	}
 	}
 
 /*Water w = new Water(col, row, tileSize, tileset.getImage("Full_water"), this, 3);
