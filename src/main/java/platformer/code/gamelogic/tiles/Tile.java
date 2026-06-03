@@ -25,7 +25,8 @@ public class Tile{
 		this.level = level;
 	}
 	
-	public void update (float tslf) {};
+	public void update (float tslf) {
+	};
 	
 	public void draw (Graphics g) {
 		if(image != null) g.drawImage(image, (int)position.x, (int)position.y, size, size, null);
@@ -33,7 +34,9 @@ public class Tile{
 		if(hitbox != null) hitbox.draw(g);		
 	}
 	
-	
+	public void setImage(BufferedImage img){
+		image = img;
+	}
 	
 	//------------------------------------Getters
 	public boolean isSolid() {
@@ -63,4 +66,5 @@ public class Tile{
 	public int getSize() {
 		return size;
 	}
+	
 }
