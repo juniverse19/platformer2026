@@ -1,5 +1,7 @@
 package platformer.code.gamelogic.level;
 
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +37,7 @@ public class Level {
 
 	private ArrayList<Enemy> enemiesList = new ArrayList<>();
 	private ArrayList<Flower> flowers = new ArrayList<>();
+	private ArrayList<Water> waters = new ArrayList<>();
 
 	private List<PlayerDieListener> dieListeners = new ArrayList<>();
 	private List<PlayerWinListener> winListeners = new ArrayList<>();
@@ -45,6 +48,8 @@ public class Level {
 	private int tileSize;
 	private Tileset tileset;
 	public static float GRAVITY = 70;
+	private long waterTimer=0;
+	private long timeAmount = 5;
 
 	public Level(LevelData leveldata) {
 		this.leveldata = leveldata;
@@ -168,6 +173,7 @@ public class Level {
 			if (player.getCollisionMatrix()[PhysicsObject.RIG] instanceof Spikes)
 				onPlayerDeath();
 
+			//better for not tiles
 			for (int i = 0; i < flowers.size(); i++) {
 				if (flowers.get(i).getHitbox().isIntersecting(player.getHitbox())) {
 					if(flowers.get(i).getType() == 1)
@@ -176,6 +182,20 @@ public class Level {
 						addGas(flowers.get(i).getCol(), flowers.get(i).getRow(), map, 20, new ArrayList<Gas>());
 					flowers.remove(i);
 					i--;
+				}
+			}
+
+			for (int i = 0; i < waters.size(); i++) {
+				if (waters.get(i).getHitbox().isIntersecting(player.getHitbox())) {
+					if(waterTimer == 0){
+						waterTimer = System.currentTimeMillis();
+					}
+					else{
+						if((System.currentTimeMillis() - waterTimer) / 1000 >= timeAmount){
+							playerDead = true;
+							waterTimer = 0;
+						}
+					}
 				}
 			}
 
@@ -217,6 +237,7 @@ public class Level {
 			w = new Water(col, row, tileSize, tileset.getImage("Falling_water"), this, 0);
 		}
 		
+		waters.add(w);
 		map.addTile(col, row, w);
 
 		//2nd make the logic for water
@@ -269,22 +290,20 @@ private void addGas(int col, int row, Map map, int numSquaresToFill, ArrayList<G
 		col = placedThisRound.get(index).getCol();
 		row = placedThisRound.get(index).getRow();
 		for(int i = 0; i < gasList.length; i++){
-			if(numSquaresToFill > 0 && (col+gasList[i][0] > 0 || (col+gasList[i][0] < map.getTiles().length)) && (row+gasList[i][1] > 0) || (row+gasList[i][1] < map.getTiles()[col].length)){
-				if()
+			if(numSquaresToFill > 0 && (col+gasList[i][0] > 0 || (col+gasList[i][0] < map.getTiles().length)) && ((row+gasList[i][1] > 0) || (row+gasList[i][1] < map.getTiles()[col].length))
+			&& (map.getTiles()[col+gasList[i][0]][row+gasList[i][1]].isSolid() == false && !(map.getTiles()[col+gasList[i][0]][row+gasList[i][1]] instanceof Gas))) {
+				if (placedThisRound.size() <numSquaresToFill) {
+					Gas g2 = new Gas(col+ gasList[i][0], row + gasList[i][1], tileSize, tileset.getImage("GasOne"), this, 0);
+					map.addTile(col+ gasList[i][0], row + gasList[i][1], g2);
+					placedThisRound.add(g2);
+				}
 			}
 		}
+		index++;
 	}
 }	
 
-/*Gas g = new Gas(col, row, tileSize, tileset.getImage("GasOne"), this, 0);
-	map.addTile(col, row, g);
-	placedThisRound.add(g);
-	int[][] gasList = {{0, -1}, {1, -1}, {-1, -1}, {1, 0}, {-1, 0}, {0, 1}, {1, 1}, {-1, 1}};
-	
-	int thing = 0;
-	while(placedThisRound.size() < numSquaresToFill){
-		
-	}*/
+
 
 	public void draw(Graphics g) {
 	   	 g.translate((int) -camera.getX(), (int) -camera.getY());
@@ -325,6 +344,8 @@ private void addGas(int col, int row, Map map, int numSquaresToFill, ArrayList<G
 	   				 tile.draw(g);
 	   		 }
 	   	 }
+		 g.setColor(Color.red);
+		 g.drawString(("" + (System.currentTimeMillis() - waterTimer / 1000)), (int) player.getX(), (int) player.getY()-10);
 
 
 	   	 // Draw the enemies
