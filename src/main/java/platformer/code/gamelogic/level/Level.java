@@ -286,7 +286,7 @@ private void addGas(int col, int row, Map map, int numSquaresToFill, ArrayList<G
 	placedThisRound.add(g);
 	int[][] gasList = {{0, -1}, {1, -1}, {-1, -1}, {1, 0}, {-1, 0}, {0, 1}, {1, 1}, {-1, 1}};
 	int index = 0;
-	while(placedThisRound.size() < numSquaresToFill){
+	while(placedThisRound.size() < numSquaresToFill && index < placedThisRound.size()){
 		col = placedThisRound.get(index).getCol();
 		row = placedThisRound.get(index).getRow();
 		for(int i = 0; i < gasList.length; i++){
