@@ -50,6 +50,8 @@ public class Level {
 	public static float GRAVITY = 70;
 	private long waterTimer=0;
 	private long timeAmount = 5;
+	private long gasTimer = 0;
+	private long gasTimeAmount = 5;
 
 	public Level(LevelData leveldata) {
 		this.leveldata = leveldata;
@@ -185,6 +187,9 @@ public class Level {
 				}
 			}
 
+
+			boolean touchingWater = false;
+
 			for (int i = 0; i < waters.size(); i++) {
 				if (waters.get(i).getHitbox().isIntersecting(player.getHitbox())) {
 					if(waterTimer == 0){
@@ -196,7 +201,42 @@ public class Level {
 							waterTimer = 0;
 						}
 					}
+
+
+					if(touchingWater = true) {
+    				player.setSpeedMultiplier(0.2f);
+						}
+					else {
+    					player.setSpeedMultiplier(1.0f);
+					}
 				}
+			}
+
+			boolean touchingGas = false;
+
+			Tile[][] tiles = map.getTiles();
+
+			for(int col = 0; col < tiles.length; col++) {
+				for(int row = 0; row < tiles[col].length; row++) {
+
+					if(tiles[col][row] instanceof Gas && tiles[col][row].getHitbox().isIntersecting(player.getHitbox())) {
+    					touchingGas = true;
+					}
+				}
+			}
+
+			if(touchingGas == true) {
+				if(gasTimer == 0) {
+					gasTimer = System.currentTimeMillis();
+				}
+				else {
+					if((System.currentTimeMillis() - gasTimer)/1000 >= gasTimeAmount) {
+						onPlayerDeath();
+					}
+				}
+			}
+			else {
+				gasTimer = 0;
 			}
 
 			// Update the enemies
